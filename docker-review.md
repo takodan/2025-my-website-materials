@@ -17,7 +17,7 @@
 
 ## 2. Basic Docker Commands
 
-1. `docker run IMAGE_NAME`： start a new container, download an image if it's not on a host
+1. `docker run IMAGE_NAME`: start a new container, download an image if it's not on a host
     1. `docker run -d IMAGE_NAME`: start a container with detach mode (running in a background)
     2. `docker attach CONTAINER_ID_OR_NAME`: switch back to attach mode
     3. `docker run --name CONTAINER_NAME IMAGE_NAME`: start a container with a name
