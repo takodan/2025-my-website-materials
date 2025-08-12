@@ -49,7 +49,7 @@
     3. editing Views
         1. Views functions
             1. example `my_get_started_project\challenges\views.py`
-            2. template
+            2. syntax
 
                 ```py
                 from django.shortcuts import render
@@ -61,7 +61,7 @@
 
         2. Create `urls.py` inside the **app** directory
             1. example `my_get_started_project\challenges\urls.py`
-            2. template
+            2. syntax
 
                 ```py
                 from django.urls import path
@@ -91,7 +91,7 @@
     1. example
         1. `my_get_started_project\challenges\urls.py`
         2. `my_get_started_project\challenges\views.py`
-    2. template
+    2. syntax
 
         ```py
         urlpatterns = [
@@ -115,7 +115,7 @@
 
 3. Redirects
     1. example `my_get_started_project\challenges\views.py`
-    2. template
+    2. syntax
 
         ```py
             return HttpResponseRedirect("/APP_NAME/" + APP_RELATIVE_PATH)
@@ -125,7 +125,7 @@
     1. example
         1. `my_get_started_project\challenges\urls.py`
         2. `my_get_started_project\challenges\views.py`
-    2. template
+    2. syntax
 
         ```py
         # \APP_NAME\urls.py
@@ -141,3 +141,136 @@
 
         PATH = reverse(PATH_NAME, args=[ARG_NAME]) # /PATH_NAME/ARG_NAME
         ```
+
+## 5. Templates and Static Files
+
+1. HTML files: add to `MY_APP\templates\MY_APP_NAME\`
+    1. add `\MY_APP_NAME\` folder is best practice to avoid conflicts across apps
+2. Response template string in `views.py`
+    1. example `templates_and_static_files\challenges\views.py`
+    2. syntax
+
+    ```py
+    from django.template.loader import render_to_string
+    def FUNCTION_NAME(request, VARIABLE_NAME):
+        response = render_to_string("MY_APP_NAME\MY_APP_HTML.html")
+        return HttpResponse(response)
+
+    # or
+    from django.shortcuts import render
+    def FUNCTION_NAME(request, VARIABLE_NAME):
+        return render(request, "MY_APP_NAME\MY_APP_HTML.html")
+
+    ```
+
+3. Add template folder manually
+    1. `MY_PROJECT\setting.py`
+
+        ```py
+        TEMPLATES = [
+            {
+                'BACKEND': ...,
+                'DIRS': [
+                    BASE_DIR / "MY_APP" / "templates"
+                ],
+                'APP_DIRS': True,
+                'OPTIONS': ...,
+                },
+            },
+        ]
+        ```
+
+4. Add template folder automatically
+    1. Set `APP_DIRS': True,` at `MY_PROJECT\setting.py`
+    2. Register app at `MY_PROJECT\setting.py`
+
+        ```py
+        INSTALLED_APPS = [
+            'MY_APP',
+            'django.contrib.admin',
+            ...,
+        ]
+        ```
+
+5. Django Template Language
+    1. enhanced HTML to create dynamic pages
+    2. example
+        1. `templates_and_static_files\challenges\views.py`
+        2. `templates_and_static_files\challenges\templates\challenges\challenge.html`
+    3. syntax
+
+        ```py
+        # in `views.py`
+        render(request, "MY_APP_NAME\MY_APP_HTML.html", {
+            "KEY":"VALUE"
+        }
+        ```
+
+        ```html
+        <!-- in a `TEMPLATE.html` -->
+        {{ VARIABLE_KEY }}
+        {}
+        ```
+
+6. Filters and Tags
+    1. [Built-in filters](https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#built-in-filter-reference)
+        1. example `templates_and_static_files\challenges\templates\challenges\challenge.html`
+        2. syntax `{{ VARIABLE_KEY| FILTER_NAME}}`
+    2. [Built-in tags](https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#built-in-tag-reference)
+        1. example
+            1. `templates_and_static_files\challenges\templates\challenges\index.html`
+            2. `templates_and_static_files\challenges\templates\challenges\challenge.html`
+        2. syntax `{% TAG %}`
+        3. commonly use tag
+
+            ```html
+            <!-- in a `TEMPLATE.html` -->
+            <!-- for loop -->
+            {% for NAME in ITERABLE %}
+                ...
+            {% endfor %}
+
+            <!-- Dynamic URLs -->
+            {% url "PATH_NAME" ARGUMENT_NAME=VARIABLE_NAME %}
+
+            <!-- if -->
+            {% if CONDITION %}
+                ...
+            {% elif CONDITION %}
+                ...
+            {% else %}
+                ...
+            {% endif %}
+            ```
+
+7. Template Inheritance with Tags
+    1. Template Inheritance
+        1. example
+            1. `templates_and_static_files\templates\base.html`
+            2. `templates_and_static_files\challenges\templates\challenges\index.html`
+            3. `templates_and_static_files\challenges\templates\challenges\challenge.html`
+        2. Remember to add parent templates folder path in `MY_PROJECT\setting.py`
+        3. syntax
+
+            ```html
+            <!-- in a `PARENT_TEMPLATE.html` -->
+            {% block BLOCK_NAME %}DEFAULT TEXT{% endblock  %}
+            ```
+
+            ```html
+            <!-- in a `CHILD_TEMPLATE.html` -->
+            {% extends "PARENT_TEMPLATE.html" %}
+            ```
+
+    2. Template Snippets
+        1. example
+            1. `templates_and_static_files\challenges\templates\challenges\includes`
+            2. `templates_and_static_files\challenges\templates\challenges\index.html`
+            3. `templates_and_static_files\challenges\templates\challenges\challenge.html`
+        2. syntax
+
+            ```html
+            <!-- in a `TEMPLATE.html` -->
+            {% include "MY_APP_NAME\INCLUDES\SNIPPET_TEMPLATE.html" %}
+            {% include "MY_APP_NAME\INCLUDES\SNIPPET_TEMPLATE.html" with VARIABLE_NAME=VALUE %}
+            ```
