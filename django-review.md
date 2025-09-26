@@ -139,10 +139,12 @@
         # \APP_NAME\views.py
         from django.urls import reverse
 
-        PATH = reverse(PATH_NAME, args=[ARG_NAME]) # /PATH_NAME/ARG_NAME
+        PATH = reverse("PATH_NAME", args=[ARG_NAME]) # /PATH_NAME/ARG_NAME
+        # or
+        PATH = reverse(FUNCTION_NAME, args=[ARG_NAME])
         ```
 
-## 5. Templates and Static Files
+## 5. Templates
 
 1. HTML files: add to `MY_APP\templates\MY_APP_NAME\`
     1. add `\MY_APP_NAME\` folder is best practice to avoid conflicts across apps
@@ -182,7 +184,8 @@
 
 4. Add template folder automatically
     1. Set `APP_DIRS': True,` at `MY_PROJECT\setting.py`
-    2. Register app at `MY_PROJECT\setting.py`
+    2. See app name at `MY_APP\app.py`
+    3. Register app at `MY_PROJECT\setting.py`
 
         ```py
         INSTALLED_APPS = [
@@ -215,7 +218,7 @@
 6. Filters and Tags
     1. [Built-in filters](https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#built-in-filter-reference)
         1. example `templates_and_static_files\challenges\templates\challenges\challenge.html`
-        2. syntax `{{ VARIABLE_KEY| FILTER_NAME}}`
+        2. syntax `{{ VARIABLE_KEY|FILTER_NAME}}`
     2. [Built-in tags](https://docs.djangoproject.com/en/5.2/ref/templates/builtins/#built-in-tag-reference)
         1. example
             1. `templates_and_static_files\challenges\templates\challenges\index.html`
@@ -227,6 +230,8 @@
             <!-- in a `TEMPLATE.html` -->
             <!-- for loop -->
             {% for NAME in ITERABLE %}
+            <!-- ITERABLE is from views.py -->
+            <!-- use NAME inside this block -->
                 ...
             {% endfor %}
 
@@ -243,6 +248,14 @@
             {% endif %}
             ```
 
+    3. Accessing Dictionaries or calling Functions in a template
+
+        ```html
+        {{ DICTIONARY.KEY }}
+        {{ FUNCTION_NAME }}
+        <!--  You cannot call a function that requires arguments in a template -->
+        ```
+
 7. Template Inheritance with Tags
     1. Template Inheritance
         1. example
@@ -250,16 +263,27 @@
             2. `templates_and_static_files\challenges\templates\challenges\index.html`
             3. `templates_and_static_files\challenges\templates\challenges\challenge.html`
         2. Remember to add parent templates folder path in `MY_PROJECT\setting.py`
+
+            ```py
+            TEMPLATES = [{
+                ...,
+                'DIRS': [
+                    BASE_DIR / "templates"
+                ],
+            }]
+            ```
+
         3. syntax
 
             ```html
             <!-- in a `PARENT_TEMPLATE.html` -->
-            {% block BLOCK_NAME %}DEFAULT TEXT{% endblock  %}
+            {% block BLOCK_NAME %}DEFAULT CONTENT{% endblock  %}
             ```
 
             ```html
             <!-- in a `CHILD_TEMPLATE.html` -->
             {% extends "PARENT_TEMPLATE.html" %}
+            {% block BLOCK_NAME %}NEW CONTENT{% endblock  %}
             ```
 
     2. Template Snippets
@@ -272,5 +296,63 @@
             ```html
             <!-- in a `TEMPLATE.html` -->
             {% include "MY_APP_NAME\INCLUDES\SNIPPET_TEMPLATE.html" %}
+            <!-- add variables only work in Snippets -->
             {% include "MY_APP_NAME\INCLUDES\SNIPPET_TEMPLATE.html" with VARIABLE_NAME=VALUE %}
             ```
+
+        3. Snippets can access every variable in the template
+    3. 404 Template
+        1. example
+            1. `templates_and_static_files\templates\404.html`
+            2. `templates_and_static_files\challenges\views.py`
+        2. syntax
+
+            ```py
+            from django.http import Http404
+            raise Http404()
+            # This will automatically return the 404.html when deploy
+            ```
+
+## 5. Static Files
+
+1. Static files
+    1. for an APP: add to `MY_APP\static\MY_APP_NAME\`
+    2. add `\MY_APP_NAME\` folder is best practice to avoid conflicts across apps
+    3. CSS, Javascript, picture, etc.
+    4. for whole project: add to `MY_PROJECT\static\`
+2. Make sure django can load static file
+    1. in `MY_PROJECT\setting.py`, make sure
+
+        ```py
+        INSTALLED_APPS = [
+            ...,
+            'django.contrib.staticfiles',
+            ...,
+        ]
+        ```
+
+    2. let Django know where to look for the static files in project level, in `MY_PROJECT\setting.py` add
+
+        ```py
+        STATICFILES_DIRS = [
+            BASE_DIR / "static"
+        ]
+        ```
+
+3. Add static files in a template
+    1. example
+        1. `templates_and_static_files\templates\base.html`
+        2. `templates_and_static_files\challenges\static\challenges\challenges.css`
+        3. `templates_and_static_files\challenges\templates\challenges\index.html`
+    2. syntax
+
+        ```html
+        <!-- in a `CHILD_TEMPLATE.html` -->
+        {% extends "PARENT_TEMPLATE.html" %}
+        {% load static %}
+        {% block BLOCK_NAME %}
+            <link rel="stylesheet" href="{% static 'MY_APP_NAME\MY_APP_CSS.css' %}">
+        {% endblock  %}
+        ```
+
+    3. You may have to restart the server to apply the css file

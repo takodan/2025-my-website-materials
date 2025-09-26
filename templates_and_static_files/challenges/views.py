@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.urls import reverse
 from django.template.loader import render_to_string
 
@@ -16,6 +16,12 @@ monthly_challenge = {
     "april": None,
     "may": None,
     "june": None,
+    "july": None,
+    "august": None,
+    "september": None,
+    "october": None,
+    "november": None,
+    "december": None,
 }
 
 def challenges_index(request):
@@ -54,7 +60,7 @@ def challenge_of_the_int(request, month):
     redirect_month = months[month - 1]
 
     # Named URLs
-    redirect_path = reverse(challenge_of_the_month, args=[redirect_month])
+    redirect_path = reverse("challenge_of_the_month_url", args=[redirect_month])
 
     # return HttpResponseRedirect("/challenges/" + redirect_month)
     return HttpResponseRedirect(redirect_path)
